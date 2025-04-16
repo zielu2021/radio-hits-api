@@ -27,4 +27,4 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Default command to run when starting the container
-CMD ["gunicorn", "resthits.wsgi:application", "--bind", "0.0.0.0:$PORT"]
+CMD gunicorn resthits.wsgi:application --bind 0.0.0.0:$PORT
