@@ -260,7 +260,7 @@
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken(), // Add CSRF token
+                'X-CSRFToken': getCsrfToken(),
             },
             body: JSON.stringify({
                 title: title,
@@ -269,26 +269,30 @@
         })
         .then(response => {
             if (!response.ok) {
-                // If response is not ok, get the error details
                 return response.json().then(data => Promise.reject(data));
             }
             return response.json();
         })
         .then(data => {
-            // Success handling
             messageDiv.textContent = 'Hit updated successfully!';
             messageDiv.classList.remove('d-none', 'alert-danger');
             messageDiv.classList.add('alert-success');
             
-            // Close modal after 1 second
+            // Store the new title_url
+            const newTitleUrl = data.title_url;
+            
+            // Close modal after 1 second and handle URL change
             setTimeout(() => {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('editHitModal'));
                 modal.hide();
-                // Refresh data as needed
-                if (typeof fetchHitDetails === 'function') {
-                    fetchHitDetails(); // For detail page
-                } else if (typeof fetchHits === 'function') {
-                    fetchHits(); // For list page
+                
+                // Check if title_url has changed
+                if (newTitleUrl !== titleUrl) {
+                    // Redirect to the new URL
+                    window.location.href = `/hits/${newTitleUrl}/`;
+                } else {
+                    // No URL change, just refresh the data
+                    fetchHitDetails();
                 }
             }, 1000);
         })
@@ -299,7 +303,6 @@
             messageDiv.classList.add('alert-danger');
         });
     }
-
     // Helper function to get CSRF token
     function getCsrfToken() {
         const cookieValue = document.cookie
