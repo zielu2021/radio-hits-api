@@ -39,4 +39,4 @@ databases:
   - name: radio-hits-db
     plan: free
     databaseName: radio_hits
-    user: postgres
+    ipAllowList: []
