@@ -62,7 +62,7 @@ This API provides endpoints to create, read, update, and delete information abou
 
 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/zielu2021/radio-hits-api.git
 cd radio_hits_api
 ```
 
