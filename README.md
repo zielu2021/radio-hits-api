@@ -12,17 +12,26 @@ This project provides a complete solution for managing radio hits and artists wi
 - Database models with proper relationships
 - Unit tests
 - Data population command
+- Docker containerization
+- Cloud deployment with HTTPS
+
+## Live Demo
+
+The application is deployed and available at: https://radio-hits-api.onrender.com/
+
+![radio-hits-api-up-and-running](screenshots/13.png)
 
 ## Technical Stack
 
-- Python 3.6+
-- Django 3.0+
+- Python 3.10+
+- Django 5.2+
 - Django REST Framework
-- PostgreSQL 13+
+- PostgreSQL 14+
 - Bootstrap 5
 - JavaScript (Fetch API)
 - HTML/CSS
-- Unit tests (Django TestCase)
+- Docker & Docker Compose
+- CI/CD via Render
 
 ## Database Schema
 
@@ -62,7 +71,9 @@ This project provides a complete solution for managing radio hits and artists wi
 - 404: Resource not found
 - 500: Server error
 
-## Installation and Setup
+## Local Development Setup
+
+### Option 1: Traditional Setup
 
 1. Clone the repository
 ```bash
@@ -100,11 +111,45 @@ python manage.py runserver
    - Frontend: http://localhost:8000/
    - API: http://localhost:8000/api/v1/
 
+### Option 2: Docker Setup
+
+1. Clone the repository
+```bash
+git clone https://github.com/zielu2021/radio-hits-api.git
+cd radio_hits_api
+```
+
+2. Build and start the Docker containers
+```bash
+docker-compose build
+docker-compose up
+```
+
+3. Access the application
+   - Frontend: http://localhost:80/
+   - API: http://localhost:80/api/v1/
+
 ## Running Tests
 
 ```bash
 python manage.py test
 ```
+
+## Deployment
+
+The application is deployed using Docker containers on Render.com with the following setup:
+
+1. Web Service: Containerized Django application
+2. Database: PostgreSQL 14
+3. HTTPS: Automatically provided by Render
+
+To deploy your own instance:
+
+1. Fork this repository
+2. Create an account on [Render](https://render.com/)
+3. Create a new Blueprint and connect your repository
+4. Render will automatically detect the `render.yaml` file and deploy the services
+
 
 ## API Usage Examples
 
@@ -270,9 +315,13 @@ radio_hits_api/
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
-├── screenshots/                # Screenshots for documentation
+├── docker/                     # Docker configuration
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── entrypoint.sh
 ├── staticfiles/                # Collected static files
 ├── requirements.txt            # Project dependencies
+├── render.yaml                 # Render deployment configuration
 └── manage.py                   # Django management script
 ```
 
@@ -288,6 +337,8 @@ radio_hits_api/
 - Interactive user interface
 - Client-side form validation
 - CSRF protection for secure requests
+- Containerized with Docker for easy deployment
+- Cloud deployment with automatic HTTPS
 
 ## Future Improvements
 
@@ -298,3 +349,4 @@ radio_hits_api/
 - Upload artist images
 - Charts for track popularity
 - Dark mode theme option
+- Admin dashboard for analytics
