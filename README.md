@@ -178,7 +178,23 @@ Returns a 204 No Content response if successful.
 
 ## Screenshots
 
-[Include screenshots of Postman tests here]
+![Postman_GET](screenshots/1.png)
+*Postman GET API*
+
+![Postman_GET](screenshots/1b.png)
+*Postman GET API DETAILS*
+
+![Postman_PUT](screenshots/2.png)
+*Postman PUT API*
+
+![Postman_POST](screenshots/3.png)
+*Postman POST API*
+
+![Postman_DELETE](screenshots/4.png)
+*Postman DELETE API*
+
+![Postman_GET_DELETE](screenshots/5.png)
+*Postman GET AFTER DELETE API*
 
 ## Project Structure
 
@@ -194,7 +210,7 @@ radio_hits_api/
 │   ├── tests.py                  # Unit tests
 │   ├── urls.py                   # API URL routing
 │   └── views.py                  # API views
-├── radio_hits_api/               # Project settings
+├── resthits/                     # Project settings
 └── manage.py
 ```
 
