@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: radio-hits-api
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: radio-hits-api.onrender.com,localhost,127.0.0.1
+      - key: DB_NAME
+        fromDatabase:
+          name: radio-hits-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: radio-hits-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: radio-hits-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: radio-hits-db
+          property: host
+      - key: DB_PORT
+        value: 5432
+      - key: POPULATE_DATA
+        value: true
+    autoDeploy: true
+
+databases:
+  - name: radio-hits-db
+    plan: free
+    databaseName: radio_hits
+    user: postgres
