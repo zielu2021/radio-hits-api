@@ -1,0 +1,403 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Radio Hits - All Hits{% endblock %}
+
+{% block nav_hits %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>All Hits</h1>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addHitModal">
+        <i class="fas fa-plus"></i> Add New Hit
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div id="hits-container">
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading hits...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Hit Modal -->
+<div class="modal fade" id="addHitModal" tabindex="-1" aria-labelledby="addHitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addHitModalLabel">Add New Hit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addHitForm">
+                    <div class="mb-3">
+                        <label for="hitTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="hitTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hitArtist" class="form-label">Artist</label>
+                        <select class="form-select" id="hitArtist" required>
+                            <option value="">Select an artist</option>
+                            <!-- Artists will be loaded here dynamically -->
+                        </select>
+                    </div>
+                    <div id="addHitMessage" class="alert d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveHitBtn">Save Hit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Hit Modal -->
+<div class="modal fade" id="deleteHitModal" tabindex="-1" aria-labelledby="deleteHitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteHitModalLabel">Delete Hit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<span id="deleteHitTitle"></span>"?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+                <input type="hidden" id="deleteHitUrl">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Hit Modal -->
+<div class="modal fade" id="editHitModal" tabindex="-1" aria-labelledby="editHitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editHitModalLabel">Edit Hit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editHitForm">
+                    <input type="hidden" id="editHitUrl">
+                    <div class="mb-3">
+                        <label for="editHitTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="editHitTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editHitArtist" class="form-label">Artist</label>
+                        <select class="form-select" id="editHitArtist" required>
+                            <option value="">Select an artist</option>
+                            <!-- Dynamically loading artists -->
+                        </select>
+                    </div>
+                    <div id="editHitMessage" class="alert d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateHitBtn">Update Hit</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let allHits = [];
+    let allArtists = [];
+
+    // Fetch hits data
+    function fetchHits() {
+    fetch('/api/v1/hits/')
+        .then(response => response.json())
+        .then(data => {
+            allHits = data.results || [];
+            displayHits(allHits);
+        })
+            .catch(error => {
+                console.error('Error fetching hits:', error);
+                const container = document.getElementById('hits-container');
+                container.innerHTML = '<div class="alert alert-danger">Error loading hits. Please try again later.</div>';
+            });
+    }
+
+    // Fetch artists data
+    function fetchArtists() {
+        fetch('/api/v1/artists/')
+            .then(response => response.json())
+            .then(data => {
+                allArtists = data;
+                populateArtistDropdowns(data);
+            })
+            .catch(error => {
+                console.error('Error fetching artists:', error);
+            });
+    }
+
+    // Display hits in the table
+    function displayHits(hits) {
+        const container = document.getElementById('hits-container');
+        if (hits.length > 0) {
+            let html = '<div class="table-responsive"><table class="table table-hover">';
+            html += '<thead><tr><th>Title</th><th>Artist</th><th>Created</th><th>Last Updated</th><th>Actions</th></tr></thead>';
+            html += '<tbody>';
+            
+            hits.forEach(hit => {
+                const createdDate = new Date(hit.created_at).toLocaleDateString();
+                const updatedDate = new Date(hit.updated_at).toLocaleDateString();
+                html += `<tr>
+                    <td>${hit.title}</td>
+                    <td>${hit.artist.full_name}</td>
+                    <td>${createdDate}</td>
+                    <td>${updatedDate}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="/hits/${hit.title_url}/" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="prepareEditHit('${hit.title_url}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="prepareDeleteHit('${hit.title_url}', '${hit.title}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = '<div class="alert alert-info">No hits found. Add a new hit to get started.</div>';
+        }
+    }
+
+    // Populate artist dropdowns for add and edit modals
+    function populateArtistDropdowns(data) {
+        const artists = data.results || [];
+        const addSelect = document.getElementById('hitArtist');
+        const editSelect = document.getElementById('editHitArtist');
+        
+        // Clear existing options
+        addSelect.innerHTML = '<option value="">Select an artist</option>';
+        editSelect.innerHTML = '<option value="">Select an artist</option>';
+        
+        // Add artist options
+        artists.forEach(artist => {
+            const option = `<option value="${artist.id}">${artist.full_name}</option>`;
+            addSelect.innerHTML += option;
+            editSelect.innerHTML += option;
+        });
+    }
+
+    // Prepare the delete hit modal
+    function prepareDeleteHit(titleUrl, title) {
+        document.getElementById('deleteHitUrl').value = titleUrl;
+        document.getElementById('deleteHitTitle').textContent = title;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteHitModal'));
+        deleteModal.show();
+    }
+
+    // Prepare the edit hit modal
+    function prepareEditHit(titleUrl) {
+        const hit = allHits.find(h => h.title_url === titleUrl);
+        if (hit) {
+            document.getElementById('editHitUrl').value = titleUrl;
+            document.getElementById('editHitTitle').value = hit.title;
+            document.getElementById('editHitArtist').value = hit.artist.id;
+            
+            // Reset any previous messages
+            const messageDiv = document.getElementById('editHitMessage');
+            messageDiv.classList.add('d-none');
+            messageDiv.classList.remove('alert-success', 'alert-danger');
+            
+            const editModal = new bootstrap.Modal(document.getElementById('editHitModal'));
+            editModal.show();
+        }
+    }
+
+    // Add a new hit
+    function addHit() {
+        const title = document.getElementById('hitTitle').value;
+        const artistId = document.getElementById('hitArtist').value;
+        const messageDiv = document.getElementById('addHitMessage');
+        
+        if (!title || !artistId) {
+            messageDiv.textContent = 'Please fill all required fields.';
+            messageDiv.classList.remove('d-none', 'alert-success');
+            messageDiv.classList.add('alert-danger');
+            return;
+        }
+        
+        fetch('/api/v1/hits/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(), // Add CSRF token
+            },
+            body: JSON.stringify({
+                title: title,
+                artist_id: parseInt(artistId)
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => Promise.reject(data));
+            }
+            return response.json();
+        })
+        .then(data => {
+            messageDiv.textContent = 'Hit added successfully!';
+            messageDiv.classList.remove('d-none', 'alert-danger');
+            messageDiv.classList.add('alert-success');
+            
+            // Reset form
+            document.getElementById('hitTitle').value = '';
+            document.getElementById('hitArtist').value = '';
+            
+            // Refresh hits list
+            fetchHits();
+            
+            // Close modal after 1 second
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addHitModal'));
+                modal.hide();
+                messageDiv.classList.add('d-none');
+            }, 1000);
+        })
+        .catch(error => {
+            console.error('Error adding hit:', error);
+            messageDiv.textContent = 'Error adding hit. Please try again.';
+            messageDiv.classList.remove('d-none', 'alert-success');
+            messageDiv.classList.add('alert-danger');
+        });
+    }
+
+    // Update an existing hit
+    function updateHit() {
+        const titleUrl = document.getElementById('editHitUrl').value;
+        const title = document.getElementById('editHitTitle').value;
+        const artistId = document.getElementById('editHitArtist').value;
+        const messageDiv = document.getElementById('editHitMessage');
+        
+        if (!title || !artistId) {
+            messageDiv.textContent = 'Please fill all required fields.';
+            messageDiv.classList.remove('d-none', 'alert-success');
+            messageDiv.classList.add('alert-danger');
+            return;
+        }
+        
+        fetch(`/api/v1/hits/${titleUrl}/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(), // Add CSRF token
+            },
+            body: JSON.stringify({
+                title: title,
+                artist_id: parseInt(artistId)
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                // If response is not ok, get the error details
+                return response.json().then(data => Promise.reject(data));
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Success handling
+            messageDiv.textContent = 'Hit updated successfully!';
+            messageDiv.classList.remove('d-none', 'alert-danger');
+            messageDiv.classList.add('alert-success');
+            
+            // Close modal after 1 second
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editHitModal'));
+                modal.hide();
+                // Refresh data as needed
+                if (typeof fetchHitDetails === 'function') {
+                    fetchHitDetails(); // For detail page
+                } else if (typeof fetchHits === 'function') {
+                    fetchHits(); // For list page
+                }
+            }, 1000);
+        })
+        .catch(error => {
+            console.error('Error updating hit:', error);
+            messageDiv.textContent = 'Error updating hit. Please try again.';
+            messageDiv.classList.remove('d-none', 'alert-success');
+            messageDiv.classList.add('alert-danger');
+        });
+    }
+
+    // Helper function to get CSRF token
+    function getCsrfToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        return cookieValue;
+    }
+
+    // Delete a hit
+    function deleteHit() {
+        const titleUrl = document.getElementById('deleteHitUrl').value;
+        
+        fetch(`/api/v1/hits/${titleUrl}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCsrfToken(), // Add CSRF token
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                // If response is not ok, try to get error details
+                return response.json()
+                    .then(data => Promise.reject(data))
+                    .catch(() => Promise.reject({ detail: 'Error deleting hit' }));
+            }
+            
+            // Handle success - either redirect or refresh
+            if (window.location.pathname.includes('/hits/') && !window.location.pathname.endsWith('/hits/')) {
+                // We're on a detail page, redirect to list
+                window.location.href = '/hits/';
+            } else {
+                // We're on the list page, refresh the list
+                fetchHits();
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteHitModal'));
+                if (modal) modal.hide();
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting hit:', error);
+            alert('Error deleting hit. Please try again.');
+        });
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchHits();
+        fetchArtists();
+        
+        // Add event listeners for buttons
+        document.getElementById('saveHitBtn').addEventListener('click', addHit);
+        document.getElementById('updateHitBtn').addEventListener('click', updateHit);
+        document.getElementById('confirmDeleteBtn').addEventListener('click', deleteHit);
+    });
+</script>
+{% endblock %}

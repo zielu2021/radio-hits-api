@@ -1,12 +1,13 @@
 # Radio Hits API
 
-A Django REST API for managing songs (hits) and artists for a hypothetical radio station.
+A Django REST API with Frontend for managing songs (hits) and artists for a hypothetical radio station.
 
 ## Overview
 
-This API provides endpoints to create, read, update, and delete information about radio hits and their artists. The project includes:
+This project provides a complete solution for managing radio hits and artists with:
 
-- RESTful API endpoints
+- RESTful API endpoints for data management
+- Modern frontend interface built with Bootstrap
 - Automatic URL slug generation
 - Database models with proper relationships
 - Unit tests
@@ -18,6 +19,9 @@ This API provides endpoints to create, read, update, and delete information abou
 - Django 3.0+
 - Django REST Framework
 - PostgreSQL 13+
+- Bootstrap 5
+- JavaScript (Fetch API)
+- HTML/CSS
 - Unit tests (Django TestCase)
 
 ## Database Schema
@@ -91,6 +95,10 @@ python manage.py populate_data
 ```bash
 python manage.py runserver
 ```
+
+7. Access the application
+   - Frontend: http://localhost:8000/
+   - API: http://localhost:8000/api/v1/
 
 ## Running Tests
 
@@ -176,7 +184,39 @@ DELETE /api/v1/hits/changed-title-hit/
 
 Returns a 204 No Content response if successful.
 
+## Frontend Features
+
+The frontend provides a user-friendly interface for managing hits and artists:
+
+- Home page with overview and latest hits
+- Complete hits management (listing, viewing, creating, editing, deleting)
+- Artists management
+- Responsive design with Bootstrap 5
+- Interactive modals for adding and editing
+- Client-side form validation
+
 ## Screenshots
+
+![Radio Hits Home Page](screenshots/6.png)
+*Radio Hits Home Page*
+
+![Hits List Page](screenshots/7.png)
+*Hits List Page with Management Options*
+
+![Artists List Page](screenshots/8.png)
+*Artists List Page*
+
+![Add New Artist Modal](screenshots/9.png)
+*Adding a New Artist via Modal*
+
+![Add New Hit Modal](screenshots/10.png)
+*Adding a New Hit via Modal*
+
+![Hit Detail Page](screenshots/11.png)
+*Hit Detail Page with Full Information*
+
+![Delete Confirmation Modal](screenshots/12.png)
+*Delete Confirmation Modal*
 
 ![Postman_GET](screenshots/1.png)
 *Postman GET API*
@@ -200,25 +240,61 @@ Returns a 204 No Content response if successful.
 
 ```
 radio_hits_api/
-├── api/
+├── api/                        # API app
 │   ├── management/
 │   │   └── commands/
 │   │       └── populate_data.py  # Data population command
 │   ├── migrations/
-│   ├── models.py                 # Database models
-│   ├── serializers.py            # API serializers
-│   ├── tests.py                  # Unit tests
-│   ├── urls.py                   # API URL routing
-│   └── views.py                  # API views
-├── resthits/                     # Project settings
-└── manage.py
+│   ├── models.py               # Database models
+│   ├── serializers.py          # API serializers
+│   ├── tests.py                # API unit tests
+│   ├── urls.py                 # API URL routing
+│   └── views.py                # API views
+├── frontend/                   # Frontend app
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── styles.css      # Custom CSS
+│   │   └── js/
+│   │       └── scripts.js      # Shared JavaScript
+│   ├── templates/
+│   │   ├── base.html           # Base template
+│   │   ├── index.html          # Homepage
+│   │   ├── hits/
+│   │   │   ├── list.html       # Hits list view
+│   │   │   └── detail.html     # Hit detail view
+│   │   └── artists/
+│   │       └── list.html       # Artists list view
+│   ├── urls.py                 # Frontend URL routing
+│   └── views.py                # Frontend views
+├── resthits/                   # Project settings
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── screenshots/                # Screenshots for documentation
+├── staticfiles/                # Collected static files
+├── requirements.txt            # Project dependencies
+└── manage.py                   # Django management script
 ```
 
 ## Features
 
 - Automatic slug generation for hit URLs
 - Slug updates when title changes
-- Full CRUD operations for hits
+- Full CRUD operations for hits and artists
 - Comprehensive test suite
 - Proper validation and error handling
 - Database population command for easy setup
+- Responsive frontend with Bootstrap
+- Interactive user interface
+- Client-side form validation
+- CSRF protection for secure requests
+
+## Future Improvements
+
+- User authentication and access control
+- Search functionality
+- Advanced filtering options
+- Pagination controls
+- Upload artist images
+- Charts for track popularity
+- Dark mode theme option

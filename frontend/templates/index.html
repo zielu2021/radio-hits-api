@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Radio Hits API - Home{% endblock %}
+
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Welcome to Radio Hits API</h1>
+    <p class="lead">A Django REST API for managing songs and artists for a hypothetical radio station.</p>
+    <hr class="my-4">
+    <p>Browse the latest hits, discover new artists, and explore our API endpoints.</p>
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg" href="{% url 'frontend:hits' %}" role="button">
+            <i class="fas fa-music"></i> Browse Hits
+        </a>
+        <a class="btn btn-secondary btn-lg" href="{% url 'frontend:artists' %}" role="button">
+            <i class="fas fa-users"></i> View Artists
+        </a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <i class="fas fa-broadcast-tower fa-4x text-primary mb-3"></i>
+                <h5 class="card-title">Radio Management</h5>
+                <p class="card-text">Easily manage your station's playlist with our intuitive interface.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <i class="fas fa-code fa-4x text-primary mb-3"></i>
+                <h5 class="card-title">RESTful API</h5>
+                <p class="card-text">Access our comprehensive API endpoints for your application needs.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-4x text-primary mb-3"></i>
+                <h5 class="card-title">Track Popularity</h5>
+                <p class="card-text">Keep track of the most popular hits and trending artists.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Latest Hits</h4>
+            </div>
+            <div class="card-body">
+                <div id="latest-hits-container">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Loading latest hits...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Fetch latest hits when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/v1/hits/')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('latest-hits-container');
+            
+            // Handle paginated response
+            const hits = data.results ? data.results : data;
+            
+            if (hits && hits.length > 0) {
+                let html = '<div class="table-responsive"><table class="table table-hover">';
+                html += '<thead><tr><th>Title</th><th>Artist</th><th>Created</th><th>Actions</th></tr></thead>';
+                html += '<tbody>';
+                
+                // Display 5 most recent hits
+                const recentHits = hits.slice(0, 5);
+                
+                recentHits.forEach(hit => {
+                    const createdDate = new Date(hit.created_at).toLocaleDateString();
+                    html += `<tr>
+                        <td>${hit.title}</td>
+                        <td>${hit.artist.full_name}</td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <a href="/hits/${hit.title_url}/" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table></div>';
+                html += '<div class="text-end mt-3"><a href="/hits/" class="btn btn-outline-primary">View All Hits</a></div>';
+                
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p class="text-center">No hits found.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching hits:', error);
+            const container = document.getElementById('latest-hits-container');
+            container.innerHTML = '<p class="text-center text-danger">Error loading hits. Please try again later.</p>';
+        });
+});
+</script>
+{% endblock %}

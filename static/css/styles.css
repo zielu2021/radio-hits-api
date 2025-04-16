@@ -1,0 +1,131 @@
+/* Custom CSS for Radio Hits Frontend */
+
+/* General styling */
+body {
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.navbar-brand i {
+    margin-right: 5px;
+}
+
+/* Card styling */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    font-weight: 500;
+}
+
+/* Button styling */
+.btn {
+    border-radius: 0.25rem;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Table styling */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Jumbotron styling */
+.jumbotron {
+    background-color: #f8f9fa;
+    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+}
+
+/* Footer styling */
+footer {
+    border-top: 1px solid #dee2e6;
+}
+
+footer a {
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Home page cards */
+.card i.fa-4x {
+    color: #0d6efd;
+    margin-bottom: 1rem;
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Animation for loading spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 0.25rem solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin .75s linear infinite;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.75rem 0;
+    margin-bottom: 1.5rem;
+}
+
+/* Alerts styling */
+.alert {
+    border-radius: 0.25rem;
+}
+
+/* Modal styling */
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .jumbotron h1 {
+        font-size: 2rem;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+    }
+}
